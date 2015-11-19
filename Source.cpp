@@ -36,6 +36,7 @@ int main(void)
 
 	ALLEGRO_BITMAP *bitmapa = al_load_bitmap("lab.jpeg");
 	ALLEGRO_FONT *font = al_load_font("FORTE.TTF", 80, 0);
+	ALLEGRO_FONT *font1 = al_load_font("FORTE.TTF", 30, 0);
 
 	event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
@@ -43,6 +44,10 @@ int main(void)
 	while (!done){
 		al_draw_bitmap(bitmapa, 0, 0, 0);
 		al_draw_textf(font, al_map_rgb(26, 255, 241), 130, 100, 0, "LABIRYNT");
+		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 200, 0, "Start gry");
+		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 230, 0, "Wybor planszy");
+		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 260, 0, "Pomoc");
+		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 290, 0, "Wyjscie z gry");
 		al_flip_display();
 		al_clear_to_color(al_map_rgb(0, 0, 0));
 
