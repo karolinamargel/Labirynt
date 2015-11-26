@@ -11,6 +11,7 @@ int main(void)
 	int height = 480;
 
 	bool done = false;
+	bool redraw = true;
 	int pos_x = width / 2;
 	int pos_y = height / 2;
 	int FPS = 60;
@@ -42,6 +43,9 @@ int main(void)
 	ALLEGRO_FONT *font = al_load_font("FORTE.TTF", 80, 0);
 	ALLEGRO_FONT *font1 = al_load_font("FORTE.TTF", 30, 0);
 	ALLEGRO_BITMAP *plansza01 = al_load_bitmap("lab00.jpg");
+	ALLEGRO_BITMAP *wybor_planszy = al_load_bitmap("lab02.jpg");
+	ALLEGRO_BITMAP *pomoc = al_load_bitmap("labirynt2.jpg");
+
 
 	timer = al_create_timer(1.0 / FPS);
 	event_queue = al_create_event_queue();
@@ -52,13 +56,16 @@ int main(void)
 	al_start_timer(timer);
 
 	while (!done){
-		al_draw_bitmap(bitmapa, 0, 0, 0); 
-		al_draw_textf(font, al_map_rgb(26, 255, 241), 130, 100, 0, "LABIRYNT");
-		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 200, 0, "Start gry");
-		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 230, 0, "Wybor planszy");
-		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 260, 0, "Pomoc");
-		al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 290, 0, "Wyjscie z gry");
-		
+		if (redraw){
+			al_draw_bitmap(bitmapa, 0, 0, 0);
+			al_draw_textf(font, al_map_rgb(26, 255, 241), 130, 100, 0, "LABIRYNT");
+			al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 200, 0, "Start gry");
+			al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 230, 0, "Wybor planszy");
+			al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 260, 0, "Pomoc");
+			al_draw_textf(font1, al_map_rgb(26, 255, 241), 130, 290, 0, "Wyjscie z gry");
+			al_flip_display();
+			redraw = false;
+		}
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 
@@ -67,17 +74,19 @@ int main(void)
 		}
 		//start gry
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 300 && ev.mouse.y >= 200 && ev.mouse.y <= 230 && ev.mouse.button == 1){
-			al_destroy_bitmap(bitmapa);
 			al_draw_bitmap(plansza01,0,0,0);
-			al_wait_for_event(event_queue, &ev);
-			al_destroy_bitmap(plansza01);
+			al_flip_display();
 		}
 		//wybor planszy
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 300 && ev.mouse.y >= 230 && ev.mouse.y <= 260 && ev.mouse.button == 1){
+			al_draw_bitmap(wybor_planszy, 0, 0, 0);
+			al_flip_display();
 			
 		}
 		//pomoc
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 200 && ev.mouse.y >= 260 && ev.mouse.y <= 290 && ev.mouse.button == 1){
+			al_draw_bitmap(pomoc, 0, 0, 0);
+			al_flip_display();
 			
 		}
 		//wyjscie z gry
@@ -85,7 +94,6 @@ int main(void)
 			done = true;
 
 		al_flip_display();
-		al_clear_to_color(al_map_rgb(0, 0, 0));
 	}
 
 	if (!bitmapa) {
