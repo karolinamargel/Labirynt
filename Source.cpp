@@ -70,15 +70,15 @@ int main(void)
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 
-		if (ev.type == ALLEGRO_EVENT_KEY_UP && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
-			if (wroc == 0){
-				done = true;
-			}
-			else if (wroc == 1){
+		if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_BACKSPACE){
+			
+			if (wroc == 1){
 				redraw = true;
 				wroc = 0;
 			}
 		}
+		if (ev.type == ALLEGRO_EVENT_KEY_UP && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+			done = true;
 		//start gry
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 300 && ev.mouse.y >= 200 && ev.mouse.y <= 230 && ev.mouse.button == 1){
 			al_draw_bitmap(plansza01,0,0,0);
