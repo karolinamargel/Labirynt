@@ -15,6 +15,7 @@ int main(void)
 	int pos_x = width / 2;
 	int pos_y = height / 2;
 	int FPS = 60;
+	int wroc = 0;
 
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -70,22 +71,31 @@ int main(void)
 		al_wait_for_event(event_queue, &ev);
 
 		if (ev.type == ALLEGRO_EVENT_KEY_UP && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
-			done = true;
+			if (wroc == 0){
+				done = true;
+			}
+			else if (wroc == 1){
+				redraw = true;
+				wroc = 0;
+			}
 		}
 		//start gry
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 300 && ev.mouse.y >= 200 && ev.mouse.y <= 230 && ev.mouse.button == 1){
 			al_draw_bitmap(plansza01,0,0,0);
+			wroc = 1;
 			al_flip_display();
 		}
 		//wybor planszy
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 300 && ev.mouse.y >= 230 && ev.mouse.y <= 260 && ev.mouse.button == 1){
 			al_draw_bitmap(wybor_planszy, 0, 0, 0);
+			wroc = 1;
 			al_flip_display();
 			
 		}
 		//pomoc
 		else if (ev.mouse.x >= 130 && ev.mouse.x <= 200 && ev.mouse.y >= 260 && ev.mouse.y <= 290 && ev.mouse.button == 1){
 			al_draw_bitmap(pomoc, 0, 0, 0);
+			wroc = 1;
 			al_flip_display();
 			
 		}
