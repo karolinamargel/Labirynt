@@ -5,6 +5,29 @@
 #include<allegro5\allegro_native_dialog.h>
 #include<allegro5\allegro_image.h>
 #include<fstream>
+#include<iostream>
+
+bool Kolizje(float x, float y, float dx, float dy, int szerokosc, int wysokosc){
+	if (x + szerokosc < dx || x > dx + szerokosc || y + wysokosc < dy || y > dy + wysokosc){
+		//brak kolizji
+		return false;
+	}
+	return true;
+}
+
+/* W FUNKCJI MAIN
+if(Kolizje(x,y,200,200,32,32)){
+if (kierunek == 0) //dol
+y -= szybkosc;
+else if (kierunek == 1) //prawo
+x += szybkosc;
+else if (kierunek == 2) //lewo
+x -= szybkosc;
+else if (kierunek == 3) //gora
+y += szybkosc;
+}
+*/
+
 
 #define RozmiarBloku 16
 //definiowanie kolorow
@@ -22,26 +45,37 @@
 #define bialy al_map_rgb(255,255,255)
 #define czarny al_map_rgb(0,0,0)
 //kolory przezroczyste
-#define niebieski1 al_map_rgba_f(0, 0, 255,0.3)
-#define czerwony1 al_map_rgba_f(255,0,0,0.05)
-#define bordowy1 al_map_rgba_f(128,0,0,0.3)
-#define pomaranczowy1 al_map_rgba_f(255,165,0,0.3)
-#define zolty1 al_map_rgba_f(255,255,0,0.3)
-#define zielony1 al_map_rgba_f(0,255,0,0.01)
-#define fioletowy1 al_map_rgba_f(128,0,128,0.3)
-#define rozowy1 al_map_rgba_f(255,20,147,0.3)
-#define roz1 al_map_rgba_f(255,0,255,0.3)
-#define blekitny1 al_map_rgba_f(0,255,255,0.3)
-#define granatowy1 al_map_rgba_f(0,0,128,0.3)
-#define bialy1 al_map_rgba_f(255,255,255,0.3)
-#define czarny1 al_map_rgba_f(0,0,0,0.3)
+#define niebieski1 al_map_rgba_f(0, 0, 255,0.005)
+#define czerwony1 al_map_rgba_f(255,0,0,0.005)
+#define bordowy1 al_map_rgba_f(128,0,0,0.005)
+#define pomaranczowy1 al_map_rgba_f(255,165,0,0.005)
+#define zolty1 al_map_rgba_f(255,255,0,0.0005)
+#define zielony1 al_map_rgba_f(0,255,0,0.001)
+#define fioletowy1 al_map_rgba_f(128,0,128,0.005)
+#define rozowy1 al_map_rgba_f(255,20,147,0.005)
+#define roz1 al_map_rgba_f(255,0,255,0.005)
+#define blekitny1 al_map_rgba_f(0,255,255,0.005)
+#define granatowy1 al_map_rgba_f(0,0,128,0.005)
+#define bialy1 al_map_rgba_f(255,255,255,0.005)
+#define czarny1 al_map_rgba_f(0,0,0,0.005)
 
 int licznikX = 0, licznikY = 0, rozmiarX, rozmiarY;
 int mapa1[40][30];
-int mapa2[40][30];  
-int mapa3[40][30];  
+int mapa2[40][30];
+int mapa3[40][30];
+int mapa4[40][30];
+int mapa5[40][30];
+int mapa6[40][30];
+int mapa7[40][30];
+int mapa8[40][30];
+int mapa9[40][30];
+int mapa10[40][30];
+int mapa11[40][30];
+int mapa12[40][30];
 
-void WczytajMape(const char *nazwa, int mapa[][30]){
+void WczytajMape(const char *nazwa, int mapa[40][30]){
+	licznikX = 0;
+	licznikY = 0;
 	std::ifstream openfile(nazwa);
 	if (openfile.is_open()){
 		openfile >> rozmiarX >> rozmiarY;
@@ -60,14 +94,17 @@ void WczytajMape(const char *nazwa, int mapa[][30]){
 	}
 }
 
-void RysujMape(int mapa[][30], ALLEGRO_COLOR kolor_tlo, ALLEGRO_COLOR kolor_lab);
+void RysujMape(int mapa[40][30], ALLEGRO_COLOR kolor_tlo, ALLEGRO_COLOR kolor_lab);
 
 int main(void)
 {
 	int width = 640;
 	int height = 480;
-	int pos_x = 65;
-	int pos_y = 265;
+	int pos_x = 0;
+	int pos_y = 0;
+	int x = 0, y = 0;
+	int szybkosc = 5;
+	int stan = NULL;
 
 	bool done = false;
 	bool redraw = true;
@@ -76,6 +113,7 @@ int main(void)
 	int wroc = 0;
 	int licz = 0;
 	int pozycja = 1; //1-menu, 2-gra, 3-wybor planszy, 4-pomoc
+	int kierunek = 0; //0-dol, 1-prawo, 2-lewo, 3-gora
 
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -109,12 +147,39 @@ int main(void)
 	ALLEGRO_BITMAP *plansza1 = al_load_bitmap("grafika/plansza1.jpg");
 	ALLEGRO_BITMAP *plansza2 = al_load_bitmap("grafika/plansza2.jpg");
 	ALLEGRO_BITMAP *plansza3 = al_load_bitmap("grafika/plansza3.jpg");
+	ALLEGRO_BITMAP *plansza4 = al_load_bitmap("grafika/plansza4.jpg");
+	ALLEGRO_BITMAP *plansza5 = al_load_bitmap("grafika/plansza5.jpg");
+	ALLEGRO_BITMAP *plansza6 = al_load_bitmap("grafika/plansza6.jpg");
+	ALLEGRO_BITMAP *plansza7 = al_load_bitmap("grafika/plansza7.jpg");
+	ALLEGRO_BITMAP *plansza8 = al_load_bitmap("grafika/plansza8.jpg");
+	ALLEGRO_BITMAP *plansza9 = al_load_bitmap("grafika/plansza9.jpg");
+	ALLEGRO_BITMAP *plansza10 = al_load_bitmap("grafika/plansza10.jpg");
+	ALLEGRO_BITMAP *plansza11 = al_load_bitmap("grafika/plansza11.jpg");
+	ALLEGRO_BITMAP *plansza12 = al_load_bitmap("grafika/plansza12.jpg");
 	ALLEGRO_BITMAP *pomoc = al_load_bitmap("grafika/pomoc.jpg");
 	ALLEGRO_BITMAP *plansza2_tlo = al_load_bitmap("grafika/tlo2.jpg");
 	ALLEGRO_BITMAP *plansza3_tlo = al_load_bitmap("grafika/tlo3.jpg");
+	ALLEGRO_BITMAP *plansza4_tlo = al_load_bitmap("grafika/tlo4.jpg");
+	ALLEGRO_BITMAP *plansza5_tlo = al_load_bitmap("grafika/tlo5.jpg");
+	ALLEGRO_BITMAP *plansza6_tlo = al_load_bitmap("grafika/tlo6.jpg");
+	ALLEGRO_BITMAP *plansza7_tlo = al_load_bitmap("grafika/tlo7.jpg");
+	ALLEGRO_BITMAP *plansza8_tlo = al_load_bitmap("grafika/tlo8.jpg");
+	ALLEGRO_BITMAP *plansza9_tlo = al_load_bitmap("grafika/tlo9.jpg");
+	ALLEGRO_BITMAP *plansza10_tlo = al_load_bitmap("grafika/tlo10.jpg");
+	ALLEGRO_BITMAP *plansza11_tlo = al_load_bitmap("grafika/tlo11.jpg");
+	ALLEGRO_BITMAP *plansza12_tlo = al_load_bitmap("grafika/tlo12.jpg");
 	WczytajMape("plansze/plansza1.txt", mapa1);
 	WczytajMape("plansze/plansza2.txt", mapa2); 
 	WczytajMape("plansze/plansza3.txt", mapa3);
+	WczytajMape("plansze/plansza4.txt", mapa4);
+	WczytajMape("plansze/plansza5.txt", mapa5);
+	WczytajMape("plansze/plansza6.txt", mapa6);
+	WczytajMape("plansze/plansza7.txt", mapa7);
+	WczytajMape("plansze/plansza8.txt", mapa8);
+	WczytajMape("plansze/plansza9.txt", mapa9);
+	WczytajMape("plansze/plansza10.txt", mapa10);
+	WczytajMape("plansze/plansza11.txt", mapa11);
+	WczytajMape("plansze/plansza12.txt", mapa12);
 
 	timer = al_create_timer(1.0 / FPS);
 	event_queue = al_create_event_queue();
@@ -141,6 +206,23 @@ int main(void)
 		}
 		if (ev.type == ALLEGRO_EVENT_KEY_UP && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 			done = true;
+
+		if (ev.type == ALLEGRO_EVENT_KEY_DOWN){
+			switch (ev.keyboard.keycode){
+			case ALLEGRO_KEY_DOWN:
+				pos_y += szybkosc;
+				break;
+			case ALLEGRO_KEY_UP:
+				pos_y -= szybkosc;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				pos_x += szybkosc;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				pos_x -= szybkosc;
+				break;
+			}
+		}
 
 		//EVENTY - MENU
 		//start gry
@@ -181,47 +263,47 @@ int main(void)
 		}
 		//plansza #4
 		else if (ev.mouse.x >= 480 && ev.mouse.x <= 608 && ev.mouse.y >= 50 && ev.mouse.y <= 171 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 7;
 			wroc = 1;
 		}
 		//plansza #5
 		else if (ev.mouse.x >= 30 && ev.mouse.x <= 158 && ev.mouse.y >= 190 && ev.mouse.y <= 311 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 8;
 			wroc = 1;
 		}
 		//plansza #6
 		else if (ev.mouse.x >= 180 && ev.mouse.x <= 308 && ev.mouse.y >= 190 && ev.mouse.y <= 311 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 9;
 			wroc = 1;
 		}
 		//plansza #7
 		else if (ev.mouse.x >= 330 && ev.mouse.x <= 458 && ev.mouse.y >= 190 && ev.mouse.y <= 311 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 10;
 			wroc = 1;
 		}
 		//plansza #8
 		else if (ev.mouse.x >= 480 && ev.mouse.x <= 608 && ev.mouse.y >= 190 && ev.mouse.y <= 311 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 11;
 			wroc = 1;
 		}
 		//plansza #9
 		else if (ev.mouse.x >= 30 && ev.mouse.x <= 158 && ev.mouse.y >= 330 && ev.mouse.y <= 451 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 12;
 			wroc = 1;
 		}
 		//plansza #10
 		else if (ev.mouse.x >= 180 && ev.mouse.x <= 308 && ev.mouse.y >= 330 && ev.mouse.y <= 451 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 13;
 			wroc = 1;
 		}
 		//plansza #11
 		else if (ev.mouse.x >= 330 && ev.mouse.x <= 458 && ev.mouse.y >= 330 && ev.mouse.y <= 451 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+			pozycja = 14;
 			wroc = 1;
 		}
 		//plansza #12
-		else if (ev.mouse.x >= 480 && ev.mouse.x <= 608 && ev.mouse.y >= 330 && ev.mouse.y <= 45 && ev.mouse.button == 1 && pozycja == 3){
-			pozycja = 2;
+		else if (ev.mouse.x >= 480 && ev.mouse.x <= 608 && ev.mouse.y >= 330 && ev.mouse.y <= 451 && ev.mouse.button == 1 && pozycja == 3){
+			pozycja = 15;
 			wroc = 1;
 		}
 		//RYSOWANIE
@@ -238,10 +320,21 @@ int main(void)
 		else if (pozycja == 2){
 			al_draw_bitmap(plansza01, 0, 0, 0);
 			RysujMape(mapa1,niebieski1,zielony);
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 5, 250, 0, "Start");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 450, 10, 0, "Meta");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
-			al_draw_filled_rectangle(pos_x, pos_y, pos_x + 10, pos_y + 10, al_map_rgb(255, 0, 0));
+			al_draw_textf(font2, zielony, 5, 250, 0, "Start");
+			al_draw_textf(font2, zielony, 450, 10, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			al_draw_filled_rectangle(pos_x + 65, pos_y + 265, pos_x + 75, pos_y + 275, al_map_rgb(255, 0, 0));
+			
+			/*if (Kolizje(pos_x, pos_y, 200, 200, 10, 10)){
+				if (kierunek == 0) //dol
+					pos_y -= szybkosc;
+				else if (kierunek == 1) //prawo
+					pos_x += szybkosc;
+				else if (kierunek == 2) //lewo
+					pos_x -= szybkosc;
+				else if (kierunek == 3) //gora
+					pos_y += szybkosc;
+			}*/
 		}
 		//wybor planszy
 		else if (pozycja == 3){
@@ -250,15 +343,15 @@ int main(void)
 			al_draw_bitmap(plansza1, 30, 50, 0);
 			al_draw_bitmap(plansza2, 180, 50, 0);
 			al_draw_bitmap(plansza3, 330, 50, 0);
-			al_draw_bitmap(plansza1, 480, 50, 0);
-			al_draw_bitmap(plansza1, 30, 190, 0);
-			al_draw_bitmap(plansza1, 180, 190, 0);
-			al_draw_bitmap(plansza1, 330, 190, 0);
-			al_draw_bitmap(plansza1, 480, 190, 0);
-			al_draw_bitmap(plansza1, 30, 330, 0);
-			al_draw_bitmap(plansza1, 180, 330, 0);
-			al_draw_bitmap(plansza1, 330, 330, 0);
-			al_draw_bitmap(plansza1, 480, 330, 0);
+			al_draw_bitmap(plansza4, 480, 50, 0);
+			al_draw_bitmap(plansza5, 30, 190, 0);
+			al_draw_bitmap(plansza6, 180, 190, 0);
+			al_draw_bitmap(plansza7, 330, 190, 0);
+			al_draw_bitmap(plansza8, 480, 190, 0);
+			al_draw_bitmap(plansza9, 30, 330, 0);
+			al_draw_bitmap(plansza10, 180, 330, 0);
+			al_draw_bitmap(plansza11, 330, 330, 0);
+			al_draw_bitmap(plansza12, 480, 330, 0);
 		}
 		//pomoc
 		else if (pozycja == 4){
@@ -271,23 +364,105 @@ int main(void)
 		//druga plansza
 		else if (pozycja == 5){
 			al_draw_bitmap(plansza2_tlo, 0, 0, 0);
-			RysujMape(mapa2,czerwony1,zolty);
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 5, 255, 0, "Start");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 578, 115, 0, "Meta");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
-			al_draw_filled_rectangle(pos_x+20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+			RysujMape(mapa2, czerwony1, zolty);
+			al_draw_textf(font2, zolty, 5, 255, 0, "Start");
+			al_draw_textf(font2, zolty, 565, 115, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x+20, pos_y, pos_x + 30, pos_y + 10, niebieski);
 		}
 		//trzecia plansza
 		else if (pozycja == 6){
 			al_draw_bitmap(plansza3_tlo, 0, 0, 0);
 			RysujMape(mapa3, zielony1, roz);
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 5, 255, 0, "Start");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 578, 115, 0, "Meta");
-			al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
-			al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+			al_draw_textf(font2, roz, 5, 255, 0, "Start");
+			al_draw_textf(font2, roz, 560, 115, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
 		}
-
-
+		//czwarta plansza
+		else if (pozycja == 7){
+			al_draw_bitmap(plansza4_tlo, 0, 0, 0);
+			RysujMape(mapa4, fioletowy1, blekitny);
+			al_draw_textf(font2, blekitny, 5, 255, 0, "Start");
+			al_draw_textf(font2, blekitny, 300, 10, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//piata plansza
+		else if (pozycja == 8){
+			al_draw_bitmap(plansza5_tlo, 0, 0, 0);
+			RysujMape(mapa5, pomaranczowy1, granatowy);
+			al_draw_textf(font2, granatowy, 100, 10, 0, "Start");
+			al_draw_textf(font2, granatowy, 572, 360, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//szosta plansza
+		else if (pozycja == 9){
+			al_draw_bitmap(plansza6_tlo, 0, 0, 0);
+			RysujMape(mapa6, blekitny1, czerwony);
+			al_draw_textf(font2, czerwony, 10, 340, 0, "Start");
+			al_draw_textf(font2, czerwony, 420, 450, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		
+		//siodma plansza
+		else if (pozycja == 10){
+			al_draw_bitmap(plansza7_tlo, 0, 0, 0);
+			RysujMape(mapa7, roz1, niebieski);
+			al_draw_textf(font2, niebieski, 5, 33, 0, "Start");
+			al_draw_textf(font2, niebieski, 5, 323, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		
+		//osma plansza
+		else if (pozycja == 11){
+			al_draw_bitmap(plansza8_tlo, 0, 0, 0);
+			RysujMape(mapa8, bordowy1, bialy);
+			al_draw_textf(font2, bialy, 5, 32, 0, "Start");
+			al_draw_textf(font2, bialy, 578, 420, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//dziewiata plansza
+		else if (pozycja == 12){
+			al_draw_bitmap(plansza9_tlo, 0, 0, 0);
+			RysujMape(mapa9, zolty1, czarny);
+			al_draw_textf(font2, czarny, 5, 180, 0, "Start");
+			al_draw_textf(font2, czarny, 578, 272, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//dziesiata plansza
+		else if (pozycja == 13){
+			al_draw_bitmap(plansza10_tlo, 0, 0, 0);
+			RysujMape(mapa10, granatowy1, rozowy);
+			al_draw_textf(font2, rozowy, 5, 130, 0, "Start");
+			al_draw_textf(font2, rozowy, 578, 370, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//jedenasta plansza
+		else if (pozycja == 14){
+			al_draw_bitmap(plansza11_tlo, 0, 0, 0);
+			RysujMape(mapa11, zielony1, bordowy);
+			al_draw_textf(font2, bordowy, 5, 420, 0, "Start");
+			al_draw_textf(font2, bordowy, 578, 32, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		//dwusnata plansza
+		else if (pozycja == 15){
+			al_draw_bitmap(plansza12_tlo, 0, 0, 0);
+			RysujMape(mapa12, czarny1, pomaranczowy);
+			al_draw_textf(font2, pomaranczowy, 5, 80, 0, "Start");
+			al_draw_textf(font2, pomaranczowy, 578, 80, 0, "Meta");
+			//al_draw_textf(font2, al_map_rgb(26, 255, 241), 10, 10, 0, "Czas: %i", 10);
+			//al_draw_filled_rectangle(pos_x + 20, pos_y, pos_x + 30, pos_y + 10, niebieski);
+		}
+		
 		al_flip_display();
 	}
 
@@ -310,7 +485,7 @@ int main(void)
 	return 0;
 }
 
-void RysujMape(int mapa[][30], ALLEGRO_COLOR kolor_tlo, ALLEGRO_COLOR kolor_lab){
+void RysujMape(int mapa[40][30], ALLEGRO_COLOR kolor_tlo, ALLEGRO_COLOR kolor_lab){
 	for (int i = 0; i < rozmiarX; i++){
 		for (int j = 0; j < rozmiarY; j++){
 			if (mapa[i][j] == 0)
