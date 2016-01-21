@@ -9,28 +9,6 @@
 #include<allegro5\allegro_color.h>
 #include<cmath>
 
-bool Kolizje(float x, float y, float dx, float dy, int szerokosc, int wysokosc){
-	if (x + szerokosc < dx || x > dx + szerokosc || y + wysokosc < dy || y > dy + wysokosc){
-		//brak kolizji
-		return false;
-	}
-	return true;
-}
-
-/* W FUNKCJI MAIN
-if(Kolizje(x,y,200,200,32,32)){
-if (kierunek == 0) //dol
-y -= szybkosc;
-else if (kierunek == 1) //prawo
-x += szybkosc;
-else if (kierunek == 2) //lewo
-x -= szybkosc;
-else if (kierunek == 3) //gora
-y += szybkosc;
-}
-*/
-
-
 #define RozmiarBloku 16
 //definiowanie kolorow
 #define czerwony al_map_rgb(255,0,0)
@@ -75,24 +53,34 @@ int mapa10[40][30];
 int mapa11[40][30];
 int mapa12[40][30];
 
-void poruszanie(ALLEGRO_EVENT ev,int *pos_x,int *pos_y,int *licz,int szybkosc){
-	if (ev.type == ALLEGRO_EVENT_KEY_DOWN){
+bool kolizja(int pos_x, int pos_y, int mapa[40][30]){
+	if (mapa[pos_x/16][pos_y/16] == 1) return true;
+
+	return false;
+}
+
+void poruszanie(ALLEGRO_EVENT ev, int *pos_x, int *pos_y, int *licz, int szybkosc, int mapa[40][30]){
+	if (ev.type == ALLEGRO_EVENT_KEY_CHAR){
 		switch (ev.keyboard.keycode){
 		case ALLEGRO_KEY_DOWN:
 			*pos_y += szybkosc;
-			*licz++;
+			if (kolizja(*pos_x + 9, *pos_y + 9, mapa) || kolizja(*pos_x, *pos_y + 9, mapa)) *pos_y -= szybkosc;
+			*licz += 1;
 			break;
 		case ALLEGRO_KEY_UP:
 			*pos_y -= szybkosc;
-			*licz++;
+			if (kolizja(*pos_x + 9, *pos_y, mapa) || kolizja(*pos_x, *pos_y, mapa)) *pos_y += szybkosc;
+			*licz += 1;
 			break;
 		case ALLEGRO_KEY_RIGHT:
 			*pos_x += szybkosc;
-			*licz++;
+			if (kolizja(*pos_x + 9, *pos_y + 9, mapa) || kolizja(*pos_x + 9, *pos_y, mapa)) *pos_x -= szybkosc;
+			*licz += 1;
 			break;
 		case ALLEGRO_KEY_LEFT:
 			*pos_x -= szybkosc;
-			*licz++;
+			if (kolizja(*pos_x, *pos_y + 9, mapa) || kolizja(*pos_x, *pos_y, mapa)) *pos_x += szybkosc;
+			*licz += 1;
 			break;
 		}
 	}
@@ -125,7 +113,7 @@ int main(void)
 {
 	int width = 640;
 	int height = 480;
-	int szybkosc = 10;
+	int szybkosc = 2;
 	int stan = NULL;
 
 	bool done = false;
@@ -138,14 +126,10 @@ int main(void)
 	int pozycja = 1; //1-menu, 2-gra, 3-wybor planszy, 4-pomoc
 	int kierunek = 0; //0-dol, 1-gora, 2-prawo, 3-lewo
 
-	int pos_x1 = 0, pos_y1 = 0, pos_x2 = 0, pos_y2 = 0, pos_x3 = 0, pos_y3 = 0;
-	int pos_x4 = 0, pos_y4 = 0, pos_x5 = 0, pos_y5 = 0, pos_x6 = 0, pos_y6 = 0;
-	int pos_x7 = 0, pos_y7 = 0, pos_x8 = 0, pos_y8 = 0, pos_x9 = 0, pos_y9 = 0;
-	int pos_x10 = 0, pos_y10 = 0, pos_x11 = 0, pos_y11 = 0, pos_x12 = 0, pos_y12 = 0;
-	//int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11, x12, y12;
-
-	//x1 = floor(pos_x1 / 16);
-	//y1 = floor(pos_y1 / 16);
+	int pos_x1 = 68, pos_y1 = 266, pos_x2 = 65, pos_y2 = 266, pos_x3 = 65, pos_y3 = 266;
+	int pos_x4 = 65, pos_y4 = 266, pos_x5 = 123, pos_y5 = 50, pos_x6 = 65, pos_y6 = 350;
+	int pos_x7 = 65, pos_y7 = 40, pos_x8 = 65, pos_y8 = 40, pos_x9 = 65, pos_y9 = 190;
+	int pos_x10 = 65, pos_y10 = 140, pos_x11 = 65, pos_y11 = 430, pos_x12 = 65, pos_y12 = 90;
 
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -215,9 +199,9 @@ int main(void)
 
 	timer = al_create_timer(1.0 / FPS);
 	event_queue = al_create_event_queue();
-	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source()); 
 	al_register_event_source(event_queue, al_get_mouse_event_source());
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	
 	al_start_timer(timer);
 
@@ -230,6 +214,19 @@ int main(void)
 			if (wroc == 1){
 				redraw = true;
 				wroc = 0;
+				pos_x1 = 68, pos_y1 = 266;
+				licz1 = 0, licz2 = 0, licz3 = 0, licz4 = 0, licz5 = 0, licz6 = 0, licz7 = 0, licz8 = 0, licz9 = 0, licz10 = 0, licz11 = 0, licz12 = 0;
+				pos_x2 = 65, pos_y2 = 266;
+				pos_x3 = 65, pos_y3 = 266;
+				pos_x4 = 65, pos_y4 = 266;
+				pos_x5 = 123, pos_y5 = 50;
+				pos_x6 = 65, pos_y6 = 350;
+				pos_x7 = 65, pos_y7 = 40;
+				pos_x8 = 65, pos_y8 = 40;
+				pos_x9 = 65, pos_y9 = 190;
+				pos_x10 = 65, pos_y10 = 140;
+				pos_x11 = 65, pos_y11 = 430;
+				pos_x12 = 65, pos_y12 = 90;
 			}
 		}
 		if (ev.type == ALLEGRO_EVENT_KEY_UP && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
@@ -334,13 +331,13 @@ int main(void)
 		}
 		//gra-pierwsza plansza
 		else if (pozycja == 2){
-			poruszanie(ev, &pos_x1, &pos_y1, &licz1, szybkosc);
+			poruszanie(ev, &pos_x1, &pos_y1, &licz1, szybkosc, mapa1);
 			al_draw_bitmap(plansza01, 0, 0, 0);
 			RysujMape(mapa1, niebieski1, zielony);
 			al_draw_textf(font2, zielony, 5, 250, 0, "Start");
 			al_draw_textf(font2, zielony, 450, 10, 0, "Meta");
 			al_draw_textf(font2, zielony, 10, 10, 0, "Ilos ruchow: %i", licz1);
-			al_draw_filled_rectangle(pos_x1 + 65, pos_y1 + 265, pos_x1 + 75, pos_y1 + 275, czerwony);
+			al_draw_filled_rectangle(pos_x1, pos_y1, pos_x1 + 10, pos_y1 + 10, czerwony);
 		}
 		//wybor planszy
 		else if (pozycja == 3){
@@ -369,115 +366,115 @@ int main(void)
 		}
 		//druga plansza
 		else if (pozycja == 5){
-			poruszanie(ev, &pos_x2, &pos_y2, &licz2, szybkosc);
+			poruszanie(ev, &pos_x2, &pos_y2, &licz2, szybkosc, mapa2);
 			al_draw_bitmap(plansza2_tlo, 0, 0, 0);
 			RysujMape(mapa2, czerwony1, zolty);
 			al_draw_textf(font2, zolty, 5, 255, 0, "Start");
 			al_draw_textf(font2, zolty, 565, 115, 0, "Meta");
 			al_draw_textf(font2, zolty, 10, 10, 0, "Ilosc ruchow: %i", licz2);
-			al_draw_filled_rectangle(pos_x2 + 65, pos_y2 + 266, pos_x2 + 75, pos_y2 + 276, niebieski);
+			al_draw_filled_rectangle(pos_x2, pos_y2, pos_x2 + 10, pos_y2 + 10, niebieski);
 		}
 		//trzecia plansza
 		else if (pozycja == 6){
-			poruszanie(ev, &pos_x3, &pos_y3, &licz3, szybkosc);
+			poruszanie(ev, &pos_x3, &pos_y3, &licz3, szybkosc, mapa3);
 			al_draw_bitmap(plansza3_tlo, 0, 0, 0);
 			RysujMape(mapa3, zielony1, roz);
 			al_draw_textf(font2, roz, 5, 255, 0, "Start");
 			al_draw_textf(font2, roz, 560, 115, 0, "Meta");
 			al_draw_textf(font2, roz, 10, 10, 0, "Ilosc ruchow: %i", licz3);
-			al_draw_filled_rectangle(pos_x3 + 65, pos_y3 + 266, pos_x3 + 75, pos_y3 + 276, granatowy);
+			al_draw_filled_rectangle(pos_x3, pos_y3, pos_x3 + 10, pos_y3 + 10, granatowy);
 		}
 		//czwarta plansza
 		else if (pozycja == 7){
-			poruszanie(ev, &pos_x4, &pos_y4, &licz4, szybkosc);
+			poruszanie(ev, &pos_x4, &pos_y4, &licz4, szybkosc, mapa4);
 			al_draw_bitmap(plansza4_tlo, 0, 0, 0);
 			RysujMape(mapa4, fioletowy1, blekitny);
 			al_draw_textf(font2, blekitny, 5, 255, 0, "Start");
 			al_draw_textf(font2, blekitny, 300, 10, 0, "Meta");
 			al_draw_textf(font2, blekitny, 10, 10, 0, "Ilosc ruchow: %i", licz4);
-			al_draw_filled_rectangle(pos_x4 + 65, pos_y4 + 266, pos_x4 + 75, pos_y4 + 276, zolty);
+			al_draw_filled_rectangle(pos_x4, pos_y4, pos_x4 + 10, pos_y4 + 10, zolty);
 		}
 		//piata plansza
 		else if (pozycja == 8){
-			poruszanie(ev, &pos_x5, &pos_y5, &licz5, szybkosc);
+			poruszanie(ev, &pos_x5, &pos_y5, &licz5, szybkosc, mapa5);
 			al_draw_bitmap(plansza5_tlo, 0, 0, 0);
 			RysujMape(mapa5, pomaranczowy1, granatowy);
 			al_draw_textf(font2, granatowy, 100, 10, 0, "Start");
 			al_draw_textf(font2, granatowy, 572, 360, 0, "Meta");
 			al_draw_textf(font2, granatowy, 430, 10, 0, "Ilosc ruchow: %i", licz5);
-			al_draw_filled_rectangle(pos_x5 + 123, pos_y5 + 50, pos_x5 + 133, pos_y5 + 60, czarny);
+			al_draw_filled_rectangle(pos_x5, pos_y5, pos_x5 + 10, pos_y5 + 10, czarny);
 		}
 		//szosta plansza
 		else if (pozycja == 9){
-			poruszanie(ev, &pos_x6, &pos_y6, &licz6, szybkosc);
+			poruszanie(ev, &pos_x6, &pos_y6, &licz6, szybkosc, mapa6);
 			al_draw_bitmap(plansza6_tlo, 0, 0, 0);
 			RysujMape(mapa6, blekitny1, czerwony);
 			al_draw_textf(font2, czerwony, 10, 340, 0, "Start");
 			al_draw_textf(font2, czerwony, 420, 450, 0, "Meta");
 			al_draw_textf(font2, czerwony, 10, 10, 0, "Ilosc ruchow: %i", licz6);
-			al_draw_filled_rectangle(pos_x6 + 65, pos_y6 + 350, pos_x6 + 75, pos_y6 + 360, niebieski);
+			al_draw_filled_rectangle(pos_x6, pos_y6, pos_x6 + 10, pos_y6 + 10, niebieski);
 		}
 		
 		//siodma plansza
 		else if (pozycja == 10){
-			poruszanie(ev, &pos_x7, &pos_y7, &licz7, szybkosc);
+			poruszanie(ev, &pos_x7, &pos_y7, &licz7, szybkosc, mapa7);
 			al_draw_bitmap(plansza7_tlo, 0, 0, 0);
 			RysujMape(mapa7, roz1, niebieski);
 			al_draw_textf(font2, niebieski, 5, 33, 0, "Start");
 			al_draw_textf(font2, niebieski, 5, 323, 0, "Meta");
 			al_draw_textf(font2, bordowy, 430, 0, 0, "Ilosc ruchow: %i", licz7);
-			al_draw_filled_rectangle(pos_x7 + 65, pos_y7 + 40, pos_x7 + 75, pos_y7 + 50, bordowy);
+			al_draw_filled_rectangle(pos_x7, pos_y7, pos_x7 + 10, pos_y7 + 10, bordowy);
 		}
 		
 		//osma plansza
 		else if (pozycja == 11){
-			poruszanie(ev, &pos_x8, &pos_y8, &licz8, szybkosc);
+			poruszanie(ev, &pos_x8, &pos_y8, &licz8, szybkosc, mapa8);
 			al_draw_bitmap(plansza8_tlo, 0, 0, 0);
 			RysujMape(mapa8, bordowy1, bialy);
 			al_draw_textf(font2, bialy, 5, 32, 0, "Start");
 			al_draw_textf(font2, bialy, 578, 420, 0, "Meta");
 			al_draw_textf(font2, granatowy, 430, 0, 0, "Ilosc ruchow: %i", licz8);
-			al_draw_filled_rectangle(pos_x8 + 65, pos_y8 + 40, pos_x8 + 75, pos_y8 + 50, granatowy);
+			al_draw_filled_rectangle(pos_x8, pos_y8, pos_x8 + 10, pos_y8 + 10, granatowy);
 		}
 		//dziewiata plansza
 		else if (pozycja == 12){
-			poruszanie(ev, &pos_x9, &pos_y9, &licz9, szybkosc);
+			poruszanie(ev, &pos_x9, &pos_y9, &licz9, szybkosc, mapa9);
 			al_draw_bitmap(plansza9_tlo, 0, 0, 0);
 			RysujMape(mapa9, zolty1, czarny);
 			al_draw_textf(font2, czarny, 5, 180, 0, "Start");
 			al_draw_textf(font2, czarny, 578, 272, 0, "Meta");
 			al_draw_textf(font2, rozowy, 430, 0, 0, "Ilosc ruchow: %i", licz9);
-			al_draw_filled_rectangle(pos_x9 + 65, pos_y9 + 190, pos_x9 + 75, pos_y9 + 200, rozowy);
+			al_draw_filled_rectangle(pos_x9, pos_y9, pos_x9 + 10, pos_y9 + 10, rozowy);
 		}
 		//dziesiata plansza
 		else if (pozycja == 13){
-			poruszanie(ev, &pos_x10, &pos_y10, &licz10, szybkosc);
+			poruszanie(ev, &pos_x10, &pos_y10, &licz10, szybkosc, mapa10);
 			al_draw_bitmap(plansza10_tlo, 0, 0, 0);
 			RysujMape(mapa10, granatowy1, rozowy);
 			al_draw_textf(font2, rozowy, 5, 130, 0, "Start");
 			al_draw_textf(font2, rozowy, 578, 370, 0, "Meta");
 			al_draw_textf(font2, bialy, 430, 0, 0, "Ilosc ruchow: %i", licz10);
-			al_draw_filled_rectangle(pos_x10 + 65, pos_y10 + 140, pos_x10 + 75, pos_y10 + 150, bialy);
+			al_draw_filled_rectangle(pos_x10, pos_y10, pos_x10 + 10, pos_y10 + 10, bialy);
 		}
 		//jedenasta plansza
 		else if (pozycja == 14){
-			poruszanie(ev, &pos_x11, &pos_y11, &licz11, szybkosc);
+			poruszanie(ev, &pos_x11, &pos_y11, &licz11, szybkosc, mapa11);
 			al_draw_bitmap(plansza11_tlo, 0, 0, 0);
 			RysujMape(mapa11, zielony1, bordowy);
 			al_draw_textf(font2, bordowy, 5, 420, 0, "Start");
 			al_draw_textf(font2, bordowy, 578, 32, 0, "Meta");
 			al_draw_textf(font2, fioletowy, 430, 0, 0, "Ilosc ruchow: %i", licz11);
-			al_draw_filled_rectangle(pos_x11 + 65, pos_y11 + 430, pos_x11 + 75, pos_y11 + 440, fioletowy);
+			al_draw_filled_rectangle(pos_x11, pos_y11, pos_x11 + 10, pos_y11 + 10, fioletowy);
 		}
 		//dwusnata plansza
 		else if (pozycja == 15){
-			poruszanie(ev, &pos_x12, &pos_y12, &licz12, szybkosc);
+			poruszanie(ev, &pos_x12, &pos_y12, &licz12, szybkosc, mapa12);
 			al_draw_bitmap(plansza12_tlo, 0, 0, 0);
 			RysujMape(mapa12, czarny1, pomaranczowy);
 			al_draw_textf(font2, pomaranczowy, 5, 80, 0, "Start");
 			al_draw_textf(font2, pomaranczowy, 578, 80, 0, "Meta");
 			al_draw_textf(font2, zielony, 430, 0, 0, "Ilosc ruchow: %i", licz12);
-			al_draw_filled_rectangle(pos_x12 + 65, pos_y12 + 90, pos_x12 + 75, pos_y12 + 100, zielony);
+			al_draw_filled_rectangle(pos_x12, pos_y12, pos_x12 + 10, pos_y12 + 10, zielony);
 		}
 		
 		al_flip_display();
